@@ -1,9 +1,9 @@
 name: Frontend Actions
-on: 
+on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   Frontend-CI:
@@ -29,6 +29,3 @@ jobs:
 
       - name: Build
         run: yarn build
-
-      - run: echo "🍏 This job's status is ${{ job.status }}."
- 

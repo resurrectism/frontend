@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  Frontend-CI:
+  install-deps:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,8 +18,31 @@ jobs:
         with:
           node-version: 16.13.0
 
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-modules-
+
       - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
+
+  format-lint-build:
+    needs: install-deps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Restore cache
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-modules-
 
       - name: Run prettier format check
         run: yarn format:check

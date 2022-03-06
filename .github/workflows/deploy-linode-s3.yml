@@ -1,0 +1,22 @@
+name: Deploy to Linode S3
+on:
+  push:
+    branches: [main]
+
+jobs:
+  Frontend-Deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up S3cmd 
+        uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: linode 
+          region: 'eu-central-1'
+          access_key: ${{ secrets.LINODE_S3_ACCESS_KEY }}
+          secret_key: ${{ secrets.LINODE_S3_SECRET_KEY }}
+
+      - name: Interact with object storage
+        run: |
+          s3cmd sync --no-mime-magic --delete-removed --delete-after --recursive --acl-public dist s3://resurrectism.denismail.space
+          s3cmd ws-info s3://resurrectism.denismail.space

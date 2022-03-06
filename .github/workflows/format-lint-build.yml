@@ -1,4 +1,4 @@
-name: Frontend Actions
+name: Format, Lint & Build 
 on:
   push:
     branches: [main]

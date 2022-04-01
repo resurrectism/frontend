@@ -3,4 +3,5 @@ build
 dist
 coverage
 .github
+pnpm-lock.yaml
 

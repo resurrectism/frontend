@@ -7,16 +7,24 @@ type ModelValidationError = {
   detail: string;
 };
 
-export class UnprocessableEntityError extends Error {
-  public errors: ModelValidationError[];
+export class ApiError extends Error {
+  constructor(public json: Record<string, unknown>, public status: number) {
+    super('Api error with status ' + status);
+  }
+}
 
-  constructor({ errors }: { errors: ModelValidationError[] }) {
+export class UnprocessableEntityError extends Error {
+  public errorsMap: Record<string, string[]>;
+
+  constructor(public errors: ModelValidationError[]) {
     super(`Unprocessable Entity: ${errors.map((e) => e.detail).join(', ')}`);
-    this.errors = errors;
+    this.errorsMap = this.createErrorsMap(errors);
   }
 
-  public get errorsMap(): Record<string, string[]> {
-    return this.errors.reduce((acc, e) => {
+  private createErrorsMap = (
+    errors: ModelValidationError[],
+  ): Record<string, string[]> =>
+    errors.reduce((acc, e) => {
       const {
         source: { pointer },
         detail,
@@ -31,7 +39,6 @@ export class UnprocessableEntityError extends Error {
 
       return acc;
     }, {} as Record<string, string[]>);
-  }
 }
 
 export class Api {
@@ -63,10 +70,11 @@ export class Api {
       json = {};
     }
 
-    if (res.status === 422) {
-      throw new UnprocessableEntityError(json);
+    const { status } = res;
+    if (status === 422) {
+      throw new UnprocessableEntityError(json.errors);
     } else if (!res.ok) {
-      throw new Error(json);
+      throw new ApiError(json, status);
     }
 
     return json;

@@ -4,15 +4,33 @@ type ModelValidationError = {
   source: {
     pointer: string;
   };
-  message: string;
+  detail: string;
 };
 
 export class UnprocessableEntityError extends Error {
   public errors: ModelValidationError[];
 
   constructor({ errors }: { errors: ModelValidationError[] }) {
-    super(`Unprocessable Entity: ${errors.map((e) => e.message).join(', ')}`);
+    super(`Unprocessable Entity: ${errors.map((e) => e.detail).join(', ')}`);
     this.errors = errors;
+  }
+
+  public get errorsMap(): Record<string, string[]> {
+    return this.errors.reduce((acc, e) => {
+      const {
+        source: { pointer },
+        detail,
+      } = e;
+      const key = pointer.replace('/data/attributes/', '');
+
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+
+      acc[key].push(detail);
+
+      return acc;
+    }, {} as Record<string, string[]>);
   }
 }
 
@@ -37,7 +55,13 @@ export class Api {
       body: JSON.stringify(data),
     };
     const res = await fetch(`${Api.host}${url}`, options);
-    const json = await res.json();
+
+    let json;
+    try {
+      json = await res.json();
+    } catch (e) {
+      json = {};
+    }
 
     if (res.status === 422) {
       throw new UnprocessableEntityError(json);

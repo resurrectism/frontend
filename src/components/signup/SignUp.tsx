@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FormControl,
   FormLabel,
-  FormHelperText,
+  FormErrorMessage,
   Input,
   Flex,
   Button,
   InputGroup,
   InputRightElement,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  CloseButton,
 } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 
@@ -23,12 +28,17 @@ export const SignUp = (props: SignUpProps): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
+
+  const [shouldRenderAlert, setShouldRenderAlert] = useState(false);
+
   async function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     setSubmitting(true);
 
+    let errors = {};
     try {
-      const json = await Api.usersCreate({
+      await Api.usersCreate({
         data: {
           type: 'user',
           attributes: {
@@ -38,18 +48,27 @@ export const SignUp = (props: SignUpProps): JSX.Element => {
           },
         },
       });
+      setShouldRenderAlert(true);
+      console.log('there', shouldRenderAlert);
     } catch (e) {
       if (e instanceof UnprocessableEntityError) {
-        console.log('caught', e.errors);
+        errors = e.errorsMap;
       }
+      setShouldRenderAlert(false);
+      console.log('here', e, shouldRenderAlert);
     }
 
-    setTimeout(() => {
-      setSubmitting(false);
-    }, 2000);
-
-    console.log('submit', email, password, props);
+    setErrors(errors);
+    setSubmitting(false);
   }
+
+  const hasErrors = (field: string) =>
+    errors[field] && errors[field].length > 0;
+  const renderErrorMessages = (field: string) =>
+    errors[field] &&
+    errors[field].map((error) => (
+      <FormErrorMessage key={error}>{error}</FormErrorMessage>
+    ));
 
   return (
     <Flex
@@ -57,17 +76,30 @@ export const SignUp = (props: SignUpProps): JSX.Element => {
       justifyContent="center"
       w={['90%', '60%', '40%']}
     >
-      <FormControl>
+      {shouldRenderAlert && (
+        <Alert status="success" mb={'1em'}>
+          <AlertIcon />
+          <AlertTitle mr={2}>User Created Successfully!</AlertTitle>
+          <CloseButton
+            position="absolute"
+            right="8px"
+            top="8px"
+            onClick={() => setShouldRenderAlert(false)}
+          />
+        </Alert>
+      )}
+
+      <FormControl isInvalid={hasErrors('email')} mb={'1em'}>
         <FormLabel htmlFor="email">Email address</FormLabel>
         <Input
           id="email"
           type="email"
           onChange={(e) => setEmail(e.currentTarget.value)}
         />
-        <FormHelperText>Helper</FormHelperText>
+        {renderErrorMessages('email')}
       </FormControl>
 
-      <FormControl>
+      <FormControl isInvalid={hasErrors('password')} mb={'1em'}>
         <FormLabel htmlFor="password">Password</FormLabel>
         <InputGroup>
           <Input
@@ -81,10 +113,10 @@ export const SignUp = (props: SignUpProps): JSX.Element => {
             </Button>
           </InputRightElement>
         </InputGroup>
-        <FormHelperText>Helper</FormHelperText>
+        {renderErrorMessages('password')}
       </FormControl>
 
-      <FormControl>
+      <FormControl isInvalid={hasErrors('password_confirmation')} mb={'1em'}>
         <FormLabel htmlFor="password_confirmation">Confirm Password</FormLabel>
         <InputGroup>
           <Input
@@ -98,9 +130,8 @@ export const SignUp = (props: SignUpProps): JSX.Element => {
             </Button>
           </InputRightElement>
         </InputGroup>
-        <FormHelperText>Helper</FormHelperText>
+        {renderErrorMessages('password_confirmation')}
       </FormControl>
-
       <Button type="submit" onClick={handleSubmit} isLoading={submitting}>
         Sign Up
       </Button>

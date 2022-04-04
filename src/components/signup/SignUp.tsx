@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   FormControl,
   FormLabel,
@@ -11,59 +11,50 @@ import {
   Alert,
   AlertIcon,
   AlertTitle,
-  AlertDescription,
   CloseButton,
 } from '@chakra-ui/react';
+import { UserSignUpAttributes } from '../../api/types';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { useForm } from 'react-hook-form';
 
 import { Api, UnprocessableEntityError } from '../../api/index';
 
-type SignUpProps = Record<string, unknown>;
+export const SignUp: React.FC = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<UserSignUpAttributes>();
 
-export const SignUp = (props: SignUpProps): JSX.Element => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
-
-  const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
   const [errors, setErrors] = useState<Record<string, string[]>>({});
-
   const [shouldRenderAlert, setShouldRenderAlert] = useState(false);
 
-  async function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    setSubmitting(true);
-
+  async function onSubmit(attributes: UserSignUpAttributes) {
     let errors = {};
+    let shouldRenderAlert = false;
+
     try {
       await Api.usersCreate({
         data: {
           type: 'user',
-          attributes: {
-            email,
-            password,
-            password_confirmation: passwordConfirmation,
-          },
+          attributes,
         },
       });
-      setShouldRenderAlert(true);
-      console.log('there', shouldRenderAlert);
+      shouldRenderAlert = true;
     } catch (e) {
       if (e instanceof UnprocessableEntityError) {
         errors = e.errorsMap;
       }
-      setShouldRenderAlert(false);
-      console.log('here', e, shouldRenderAlert);
     }
 
+    setShouldRenderAlert(shouldRenderAlert);
     setErrors(errors);
-    setSubmitting(false);
   }
 
   const hasErrors = (field: string) =>
     errors[field] && errors[field].length > 0;
+
   const renderErrorMessages = (field: string) =>
     errors[field] &&
     errors[field].map((error) => (
@@ -74,67 +65,74 @@ export const SignUp = (props: SignUpProps): JSX.Element => {
     <Flex
       direction={'column'}
       justifyContent="center"
-      w={['90%', '60%', '40%']}
+      width={'100%'}
+      maxWidth={'400px'}
+      mt={12}
     >
-      {shouldRenderAlert && (
-        <Alert status="success" mb={'1em'}>
-          <AlertIcon />
-          <AlertTitle mr={2}>User Created Successfully!</AlertTitle>
-          <CloseButton
-            position="absolute"
-            right="8px"
-            top="8px"
-            onClick={() => setShouldRenderAlert(false)}
-          />
-        </Alert>
-      )}
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {shouldRenderAlert && (
+          <Alert status="success" mb={'1em'}>
+            <AlertIcon />
+            <AlertTitle mr={2}>User Created Successfully!</AlertTitle>
+            <CloseButton
+              position="absolute"
+              right="8px"
+              top="8px"
+              onClick={() => setShouldRenderAlert(false)}
+            />
+          </Alert>
+        )}
 
-      <FormControl isInvalid={hasErrors('email')} mb={'1em'}>
-        <FormLabel htmlFor="email">Email address</FormLabel>
-        <Input
-          id="email"
-          type="email"
-          onChange={(e) => setEmail(e.currentTarget.value)}
-        />
-        {renderErrorMessages('email')}
-      </FormControl>
-
-      <FormControl isInvalid={hasErrors('password')} mb={'1em'}>
-        <FormLabel htmlFor="password">Password</FormLabel>
-        <InputGroup>
+        <FormControl isInvalid={hasErrors('email')} mb={'1em'}>
+          <FormLabel htmlFor="email">Email address</FormLabel>
           <Input
-            id="password"
-            type={showPassword ? 'text' : 'password'}
-            onChange={(e) => setPassword(e.currentTarget.value)}
+            id="email"
+            type="email"
+            {...register('email', { required: true })}
           />
-          <InputRightElement>
-            <Button onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
-        {renderErrorMessages('password')}
-      </FormControl>
+          {renderErrorMessages('email')}
+        </FormControl>
 
-      <FormControl isInvalid={hasErrors('password_confirmation')} mb={'1em'}>
-        <FormLabel htmlFor="password_confirmation">Confirm Password</FormLabel>
-        <InputGroup>
-          <Input
-            id="password_confirmation"
-            type={showPassword ? 'text' : 'password'}
-            onChange={(e) => setPasswordConfirmation(e.currentTarget.value)}
-          />
-          <InputRightElement>
-            <Button onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
-        {renderErrorMessages('password_confirmation')}
-      </FormControl>
-      <Button type="submit" onClick={handleSubmit} isLoading={submitting}>
-        Sign Up
-      </Button>
+        <FormControl isInvalid={hasErrors('password')} mb={'1em'}>
+          <FormLabel htmlFor="password">Password</FormLabel>
+          <InputGroup>
+            <Input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              {...register('password', { required: true })}
+            />
+            <InputRightElement>
+              <Button onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+          {renderErrorMessages('password')}
+        </FormControl>
+
+        <FormControl isInvalid={hasErrors('password_confirmation')} mb={'1em'}>
+          <FormLabel htmlFor="password_confirmation">
+            Confirm Password
+          </FormLabel>
+          <InputGroup>
+            <Input
+              id="password_confirmation"
+              type={showPassword ? 'text' : 'password'}
+              {...register('password_confirmation', { required: true })}
+            />
+            <InputRightElement>
+              <Button onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+          {renderErrorMessages('password_confirmation')}
+        </FormControl>
+
+        <Button type="submit" isLoading={isSubmitting} isFullWidth>
+          Sign Up
+        </Button>
+      </form>
     </Flex>
   );
 };

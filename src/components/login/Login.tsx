@@ -2,82 +2,95 @@ import { useState } from 'react';
 import {
   FormControl,
   FormLabel,
-  FormHelperText,
+  FormErrorMessage,
   Input,
   Flex,
   Button,
   InputGroup,
   InputRightElement,
 } from '@chakra-ui/react';
+import { UserSignUpAttributes } from '../../api/types';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { useForm } from 'react-hook-form';
 
-import { Api } from '../../api/index';
+import { Api, UnprocessableEntityError } from '../../api/index';
 
-type LoginProps = Record<string, unknown>;
+export const Login: React.FC = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<UserSignUpAttributes>();
 
-export const Login = (props: LoginProps): JSX.Element => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
 
-  async function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    setSubmitting(true);
-
+  async function onSubmit(attributes: UserSignUpAttributes) {
+    let errors = {};
     try {
-      const json = await Api.usersLogin({
+      await Api.usersCreate({
         data: {
           type: 'user',
-          attributes: {
-            email,
-            password,
-          },
+          attributes,
         },
       });
-      console.log(json);
     } catch (e) {
-      console.log('error', e);
+      if (e instanceof UnprocessableEntityError) {
+        errors = e.errorsMap;
+      }
     }
-
-    setTimeout(() => {
-      setSubmitting(false);
-    }, 2000);
-
-    console.log('submit', email, password, props);
+    setErrors(errors);
   }
 
-  return (
-    <Flex direction="column" justifyContent="center" w={['90%', '60%', '40%']}>
-      <FormControl>
-        <FormLabel htmlFor="email">Email address</FormLabel>
-        <Input
-          id="email"
-          type="email"
-          onChange={(e) => setEmail(e.currentTarget.value)}
-        />
-        <FormHelperText>Helper</FormHelperText>
-      </FormControl>
+  const hasErrors = (field: string) =>
+    errors[field] && errors[field].length > 0;
 
-      <FormControl>
-        <FormLabel htmlFor="password">Password</FormLabel>
-        <InputGroup>
+  const renderErrorMessages = (field: string) =>
+    errors[field] &&
+    errors[field].map((error) => (
+      <FormErrorMessage key={error}>{error}</FormErrorMessage>
+    ));
+
+  return (
+    <Flex
+      direction={'column'}
+      justifyContent="center"
+      width={'100%'}
+      maxWidth={'400px'}
+      mt={12}
+    >
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormControl isInvalid={hasErrors('email')} mb={'1em'}>
+          <FormLabel htmlFor="email">Email address</FormLabel>
           <Input
-            id="password"
-            type={showPassword ? 'text' : 'password'}
-            onChange={(e) => setPassword(e.currentTarget.value)}
+            id="email"
+            type="email"
+            {...register('email', { required: true })}
           />
-          <InputRightElement>
-            <Button onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
-        <FormHelperText>Helper</FormHelperText>
-        <Button type="submit" onClick={handleSubmit} isLoading={submitting}>
+          {renderErrorMessages('email')}
+        </FormControl>
+
+        <FormControl isInvalid={hasErrors('password')} mb={'1em'}>
+          <FormLabel htmlFor="password">Password</FormLabel>
+          <InputGroup>
+            <Input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              {...register('password', { required: true })}
+            />
+            <InputRightElement>
+              <Button onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+          {renderErrorMessages('password')}
+        </FormControl>
+
+        <Button type="submit" isLoading={isSubmitting} isFullWidth>
           Login
         </Button>
-      </FormControl>
+      </form>
     </Flex>
   );
 };

@@ -1,20 +1,16 @@
-export type UserLogin = {
-  data: {
-    type: 'user';
-    attributes: {
-      email: string;
-      password: string;
-    };
-  };
+export type Resource<Attributes, Type> = {
+  data: { type: Type; attributes: Attributes };
 };
 
-export type UserSignUp = {
-  data: {
-    type: 'user';
-    attributes: {
-      email: string;
-      password: string;
-      password_confirmation: string;
-    };
-  };
+export type UserLoginAttributes = {
+  email: string;
+  password: string;
 };
+export type UserLogin = Resource<UserLoginAttributes, 'user'>;
+
+export type UserSignUpAttributes = {
+  email: string;
+  password: string;
+  password_confirmation: string;
+};
+export type UserSignUp = Resource<UserSignUpAttributes, 'user'>;

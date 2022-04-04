@@ -1,91 +1,89 @@
 import { useState } from 'react';
 import {
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  Input,
   Flex,
   Button,
-  InputGroup,
-  InputRightElement,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  CloseButton,
+  AlertDescription,
+  Box,
 } from '@chakra-ui/react';
-import { UserSignUpAttributes } from '../../api/types';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { UserLoginAttributes } from '../../api/types';
 import { useForm } from 'react-hook-form';
 
-import { Api, UnprocessableEntityError } from '../../api/index';
+import { Api, ApiError } from '../../api/index';
+import {
+  InputFormControl,
+  PasswordFormControl,
+} from '../form/InputFormControl';
 
 export const Login: React.FC = () => {
   const {
     register,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<UserSignUpAttributes>();
+  } = useForm<UserLoginAttributes>();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [shouldRenderAlert, setShouldRenderAlert] = useState(false);
 
-  async function onSubmit(attributes: UserSignUpAttributes) {
-    let errors = {};
+  async function onSubmit(attributes: UserLoginAttributes) {
     try {
-      await Api.usersCreate({
+      await Api.usersLogin({
         data: {
           type: 'user',
           attributes,
         },
       });
     } catch (e) {
-      if (e instanceof UnprocessableEntityError) {
-        errors = e.errorsMap;
+      if (e instanceof ApiError) {
+        setShouldRenderAlert(true);
+      } else {
+        throw e;
       }
     }
-    setErrors(errors);
   }
-
-  const hasErrors = (field: string) =>
-    errors[field] && errors[field].length > 0;
-
-  const renderErrorMessages = (field: string) =>
-    errors[field] &&
-    errors[field].map((error) => (
-      <FormErrorMessage key={error}>{error}</FormErrorMessage>
-    ));
 
   return (
     <Flex
       direction={'column'}
       justifyContent="center"
-      width={'100%'}
       maxWidth={'400px'}
-      mt={12}
+      width={'100%'}
+      p={12}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <FormControl isInvalid={hasErrors('email')} mb={'1em'}>
-          <FormLabel htmlFor="email">Email address</FormLabel>
-          <Input
-            id="email"
-            type="email"
-            {...register('email', { required: true })}
-          />
-          {renderErrorMessages('email')}
-        </FormControl>
-
-        <FormControl isInvalid={hasErrors('password')} mb={'1em'}>
-          <FormLabel htmlFor="password">Password</FormLabel>
-          <InputGroup>
-            <Input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              {...register('password', { required: true })}
+        {shouldRenderAlert && (
+          <Alert status="error" mb={'1em'}>
+            <AlertIcon />
+            <Box flex="1">
+              <AlertTitle mr={2}>Failed to login!</AlertTitle>
+              <AlertDescription mr={2}>
+                Check your email and password
+              </AlertDescription>
+            </Box>
+            <CloseButton
+              position="absolute"
+              right="8px"
+              top="8px"
+              onClick={() => setShouldRenderAlert(false)}
             />
-            <InputRightElement>
-              <Button onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-              </Button>
-            </InputRightElement>
-          </InputGroup>
-          {renderErrorMessages('password')}
-        </FormControl>
+          </Alert>
+        )}
+
+        <InputFormControl
+          fieldName="email"
+          label="Email Address"
+          mb={'1em'}
+          InputProps={{ ...register('email', { required: true }) }}
+        />
+
+        <PasswordFormControl
+          fieldName="password"
+          label="Password"
+          mb={'1em'}
+          InputProps={{ ...register('password', { required: true }) }}
+        />
 
         <Button type="submit" isLoading={isSubmitting} isFullWidth>
           Login

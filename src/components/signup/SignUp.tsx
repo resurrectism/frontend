@@ -1,23 +1,21 @@
 import { useState } from 'react';
 import {
-  FormControl,
-  FormLabel,
   FormErrorMessage,
-  Input,
   Flex,
   Button,
-  InputGroup,
-  InputRightElement,
   Alert,
   AlertIcon,
   AlertTitle,
   CloseButton,
 } from '@chakra-ui/react';
 import { UserSignUpAttributes } from '../../api/types';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useForm } from 'react-hook-form';
 
 import { Api, UnprocessableEntityError } from '../../api/index';
+import {
+  InputFormControl,
+  PasswordFormControl,
+} from '../form/InputFormControl';
 
 export const SignUp: React.FC = () => {
   const {
@@ -26,7 +24,6 @@ export const SignUp: React.FC = () => {
     formState: { isSubmitting },
   } = useForm<UserSignUpAttributes>();
 
-  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [shouldRenderAlert, setShouldRenderAlert] = useState(false);
 
@@ -65,9 +62,9 @@ export const SignUp: React.FC = () => {
     <Flex
       direction={'column'}
       justifyContent="center"
-      width={'100%'}
       maxWidth={'400px'}
-      mt={12}
+      width={'100%'}
+      p={12}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         {shouldRenderAlert && (
@@ -83,51 +80,37 @@ export const SignUp: React.FC = () => {
           </Alert>
         )}
 
-        <FormControl isInvalid={hasErrors('email')} mb={'1em'}>
-          <FormLabel htmlFor="email">Email address</FormLabel>
-          <Input
-            id="email"
-            type="email"
-            {...register('email', { required: true })}
-          />
+        <InputFormControl
+          fieldName="email"
+          label="Email Address"
+          isInvalid={hasErrors('email')}
+          mb={'1em'}
+          InputProps={{ ...register('email', { required: true }) }}
+        >
           {renderErrorMessages('email')}
-        </FormControl>
+        </InputFormControl>
 
-        <FormControl isInvalid={hasErrors('password')} mb={'1em'}>
-          <FormLabel htmlFor="password">Password</FormLabel>
-          <InputGroup>
-            <Input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              {...register('password', { required: true })}
-            />
-            <InputRightElement>
-              <Button onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-              </Button>
-            </InputRightElement>
-          </InputGroup>
+        <PasswordFormControl
+          fieldName="password"
+          label="Password"
+          isInvalid={hasErrors('password')}
+          mb={'1em'}
+          InputProps={{ ...register('password', { required: true }) }}
+        >
           {renderErrorMessages('password')}
-        </FormControl>
+        </PasswordFormControl>
 
-        <FormControl isInvalid={hasErrors('password_confirmation')} mb={'1em'}>
-          <FormLabel htmlFor="password_confirmation">
-            Confirm Password
-          </FormLabel>
-          <InputGroup>
-            <Input
-              id="password_confirmation"
-              type={showPassword ? 'text' : 'password'}
-              {...register('password_confirmation', { required: true })}
-            />
-            <InputRightElement>
-              <Button onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-              </Button>
-            </InputRightElement>
-          </InputGroup>
+        <PasswordFormControl
+          fieldName="password_confirmation"
+          label="Password Confirmation"
+          isInvalid={hasErrors('password_confirmation')}
+          mb={'1em'}
+          InputProps={{
+            ...register('password_confirmation', { required: true }),
+          }}
+        >
           {renderErrorMessages('password_confirmation')}
-        </FormControl>
+        </PasswordFormControl>
 
         <Button type="submit" isLoading={isSubmitting} isFullWidth>
           Sign Up

@@ -10,7 +10,6 @@ function App() {
   return (
     <div>
       <Flex
-        color="blue"
         w="100vw"
         h="100vh"
         direction="column"

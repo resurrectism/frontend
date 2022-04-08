@@ -29,7 +29,10 @@ export const PasswordFormControl: React.FC<InputFormControlProps> = ({
           {...InputProps}
         />
         <InputRightElement>
-          <Button onClick={() => setShowPassword(!showPassword)}>
+          <Button
+            onClick={() => setShowPassword(!showPassword)}
+            variant="ghost"
+          >
             {showPassword ? <ViewIcon /> : <ViewOffIcon />}
           </Button>
         </InputRightElement>

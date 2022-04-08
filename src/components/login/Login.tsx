@@ -13,10 +13,8 @@ import { UserLoginAttributes } from '../../api/types';
 import { useForm } from 'react-hook-form';
 
 import { Api, ApiError } from '../../api/index';
-import {
-  InputFormControl,
-  PasswordFormControl,
-} from '../form/InputFormControl';
+import { InputFormControl } from '../form/InputFormControl';
+import { PasswordFormControl } from '../form/PasswordFormControl';
 
 export const Login: React.FC = () => {
   const {

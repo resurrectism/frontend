@@ -1,7 +1,7 @@
 import { Route } from 'wouter';
 import { Flex } from '@chakra-ui/react';
 
-import { Navbar } from './components/navbar/Navbar';
+import { Navbar } from './components/layout/Navbar';
 import HomePage from './pages/home/HomePage';
 import LoginPage from './pages/login/LoginPage';
 import SignUpPage from './pages/signup/SignUpPage';

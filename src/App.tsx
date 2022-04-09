@@ -1,12 +1,19 @@
-import { Route } from 'wouter';
 import { Flex } from '@chakra-ui/react';
+import { useAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 
 import { Navbar } from './components/layout/Navbar';
-import HomePage from './pages/home/HomePage';
-import LoginPage from './pages/login/LoginPage';
-import SignUpPage from './pages/signup/SignUpPage';
+import UnauthenticatedContent from './components/layout/UnauthenticatedContent';
+import AuthenticatedContent from './components/layout/AuthenticatedContent';
+
+export const isAuthenticatedAtom = atomWithStorage<boolean>(
+  'isAuthenticated',
+  false,
+);
 
 function App() {
+  const [isAuthenticated] = useAtom(isAuthenticatedAtom);
+
   return (
     <div>
       <Flex
@@ -17,9 +24,11 @@ function App() {
         alignItems="center"
       >
         <Navbar />
-        <Route path="/" component={HomePage} />
-        <Route path="/signup" component={SignUpPage} />
-        <Route path="/login" component={LoginPage} />
+        {isAuthenticated ? (
+          <AuthenticatedContent />
+        ) : (
+          <UnauthenticatedContent />
+        )}
       </Flex>
     </div>
   );

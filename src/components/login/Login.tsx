@@ -9,12 +9,15 @@ import {
   AlertDescription,
   Box,
 } from '@chakra-ui/react';
-import { UserLoginAttributes } from '../../api/types';
 import { useForm } from 'react-hook-form';
+import { useUpdateAtom } from 'jotai/utils';
 
+import { UserLoginAttributes } from '../../api/types';
 import { Api, ApiError } from '../../api/index';
 import { InputFormControl } from '../form/InputFormControl';
 import { PasswordFormControl } from '../form/PasswordFormControl';
+import { isAuthenticatedAtom } from '../../App';
+import { useLocation } from 'wouter';
 
 export const Login: React.FC = () => {
   const {
@@ -23,7 +26,9 @@ export const Login: React.FC = () => {
     formState: { isSubmitting },
   } = useForm<UserLoginAttributes>();
 
+  const setIsAuthenticated = useUpdateAtom(isAuthenticatedAtom);
   const [shouldRenderAlert, setShouldRenderAlert] = useState(false);
+  const [, navigate] = useLocation();
 
   async function onSubmit(attributes: UserLoginAttributes) {
     try {
@@ -33,6 +38,8 @@ export const Login: React.FC = () => {
           attributes,
         },
       });
+      setIsAuthenticated(true);
+      navigate('/');
     } catch (e) {
       if (e instanceof ApiError) {
         setShouldRenderAlert(true);

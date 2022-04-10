@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Flex,
   Button,
@@ -10,14 +9,14 @@ import {
   Box,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
-import { useUpdateAtom } from 'jotai/utils';
 
 import { UserLoginAttributes } from '../../api/types';
-import { Api, ApiError } from '../../api/index';
-import { isAuthenticatedAtom } from '../../App';
+import { Api, UnauthorizedError } from '../../api/index';
 import { useLocation } from 'wouter';
 import { InputFormControl } from '../../components/form/InputFormControl';
 import { PasswordFormControl } from '../../components/form/PasswordFormControl';
+import { useUpdateIsAuthenticated } from '../../hooks/user/useIsAuthenticated';
+import useToggle from '../../hooks/useToggle';
 
 const LoginForm: React.FC = () => {
   const {
@@ -26,8 +25,8 @@ const LoginForm: React.FC = () => {
     formState: { isSubmitting },
   } = useForm<UserLoginAttributes>();
 
-  const setIsAuthenticated = useUpdateAtom(isAuthenticatedAtom);
-  const [shouldRenderAlert, setShouldRenderAlert] = useState(false);
+  const setIsAuthenticated = useUpdateIsAuthenticated();
+  const [hasError, toggleHasError] = useToggle();
   const [, navigate] = useLocation();
 
   async function onSubmit(attributes: UserLoginAttributes) {
@@ -40,9 +39,10 @@ const LoginForm: React.FC = () => {
       });
       setIsAuthenticated(true);
       navigate('/');
+      toggleHasError(false);
     } catch (e) {
-      if (e instanceof ApiError) {
-        setShouldRenderAlert(true);
+      if (e instanceof UnauthorizedError) {
+        toggleHasError(true);
       } else {
         throw e;
       }
@@ -58,7 +58,7 @@ const LoginForm: React.FC = () => {
       p={12}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        {shouldRenderAlert && (
+        {hasError && (
           <Alert status="error" mb={'1em'}>
             <AlertIcon />
             <Box flex="1">
@@ -71,7 +71,7 @@ const LoginForm: React.FC = () => {
               position="absolute"
               right="8px"
               top="8px"
-              onClick={() => setShouldRenderAlert(false)}
+              onClick={() => toggleHasError(false)}
             />
           </Alert>
         )}

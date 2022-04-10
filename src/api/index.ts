@@ -41,6 +41,12 @@ export class UnprocessableEntityError extends Error {
     }, {} as Record<string, string[]>);
 }
 
+export class UnauthorizedError extends Error {
+  constructor() {
+    super('Unauthorized');
+  }
+}
+
 export class Api {
   static get host(): string {
     return import.meta.env.PROD
@@ -73,6 +79,8 @@ export class Api {
     const { status } = res;
     if (status === 422) {
       throw new UnprocessableEntityError(json.errors);
+    } else if (status === 401) {
+      throw new UnauthorizedError();
     } else if (!res.ok) {
       throw new ApiError(json, status);
     }

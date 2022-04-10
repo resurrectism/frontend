@@ -1,8 +1,8 @@
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
 import { Flex, Box, Button } from '@chakra-ui/react';
-import { useAtom } from 'jotai';
-import { isAuthenticatedAtom } from '../../App';
-import { RESET, useUpdateAtom } from 'jotai/utils';
+
+import { useIsAuthenticated } from '../../hooks/user/useIsAuthenticated';
+import useLogout from '../../hooks/user/useLogout';
 
 const NAVBAR_HEIGHT = '3.5rem';
 
@@ -32,13 +32,7 @@ const UnauthenticatedNavbar: React.FC = () => {
 };
 
 const AuthenticatedNavbar: React.FC = () => {
-  const setIsAuthenticated = useUpdateAtom(isAuthenticatedAtom);
-  const [, navigate] = useLocation();
-
-  const logout = () => {
-    navigate('/login');
-    setIsAuthenticated(RESET);
-  };
+  const logout = useLogout();
 
   return (
     <Flex
@@ -64,11 +58,7 @@ const AuthenticatedNavbar: React.FC = () => {
 };
 
 export const Navbar: React.FC = () => {
-  const [isAuthenticated] = useAtom(isAuthenticatedAtom);
+  const [isAuthenticated] = useIsAuthenticated();
 
-  if (isAuthenticated) {
-    return <AuthenticatedNavbar />;
-  } else {
-    return <UnauthenticatedNavbar />;
-  }
+  return isAuthenticated ? <AuthenticatedNavbar /> : <UnauthenticatedNavbar />;
 };

@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form';
 import { Api, UnprocessableEntityError } from '../../api/index';
 import { InputFormControl } from '../../components/form/InputFormControl';
 import { PasswordFormControl } from '../../components/form/PasswordFormControl';
+import useToggle from '../../hooks/useToggle';
 
 const SignUpForm: React.FC = () => {
   const {
@@ -23,11 +24,11 @@ const SignUpForm: React.FC = () => {
   } = useForm<UserSignUpAttributes>();
 
   const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [shouldRenderAlert, setShouldRenderAlert] = useState(false);
+  const [isSuccessful, toggleIsSuccessful] = useToggle();
 
   async function onSubmit(attributes: UserSignUpAttributes) {
     let errors = {};
-    let shouldRenderAlert = false;
+    let isSuccessful = false;
 
     try {
       await Api.usersCreate({
@@ -36,14 +37,14 @@ const SignUpForm: React.FC = () => {
           attributes,
         },
       });
-      shouldRenderAlert = true;
+      isSuccessful = true;
     } catch (e) {
       if (e instanceof UnprocessableEntityError) {
         errors = e.errorsMap;
       }
     }
 
-    setShouldRenderAlert(shouldRenderAlert);
+    toggleIsSuccessful(isSuccessful);
     setErrors(errors);
   }
 
@@ -65,7 +66,7 @@ const SignUpForm: React.FC = () => {
       p={12}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        {shouldRenderAlert && (
+        {isSuccessful && (
           <Alert status="success" mb={'1em'}>
             <AlertIcon />
             <AlertTitle mr={2}>User Created Successfully!</AlertTitle>
@@ -73,7 +74,7 @@ const SignUpForm: React.FC = () => {
               position="absolute"
               right="8px"
               top="8px"
-              onClick={() => setShouldRenderAlert(false)}
+              onClick={() => toggleIsSuccessful(false)}
             />
           </Alert>
         )}

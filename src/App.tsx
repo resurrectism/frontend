@@ -1,18 +1,14 @@
 import { Flex } from '@chakra-ui/react';
-import { useAtom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
 
 import { Navbar } from './components/layout/Navbar';
 import UnauthenticatedContent from './components/layout/UnauthenticatedContent';
 import AuthenticatedContent from './components/layout/AuthenticatedContent';
-
-export const isAuthenticatedAtom = atomWithStorage<boolean>(
-  'isAuthenticated',
-  false,
-);
+import useGlobalRejectionHandler from './hooks/useGlobalRejectionHandler';
+import { useIsAuthenticated } from './hooks/user/useIsAuthenticated';
 
 function App() {
-  const [isAuthenticated] = useAtom(isAuthenticatedAtom);
+  const [isAuthenticated] = useIsAuthenticated();
+  useGlobalRejectionHandler();
 
   return (
     <div>

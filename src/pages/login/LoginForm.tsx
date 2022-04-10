@@ -14,12 +14,12 @@ import { useUpdateAtom } from 'jotai/utils';
 
 import { UserLoginAttributes } from '../../api/types';
 import { Api, ApiError } from '../../api/index';
-import { InputFormControl } from '../form/InputFormControl';
-import { PasswordFormControl } from '../form/PasswordFormControl';
 import { isAuthenticatedAtom } from '../../App';
 import { useLocation } from 'wouter';
+import { InputFormControl } from '../../components/form/InputFormControl';
+import { PasswordFormControl } from '../../components/form/PasswordFormControl';
 
-export const Login: React.FC = () => {
+const LoginForm: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -97,3 +97,5 @@ export const Login: React.FC = () => {
     </Flex>
   );
 };
+
+export default LoginForm;

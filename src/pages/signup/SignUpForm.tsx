@@ -12,10 +12,10 @@ import { UserSignUpAttributes } from '../../api/types';
 import { useForm } from 'react-hook-form';
 
 import { Api, UnprocessableEntityError } from '../../api/index';
-import { InputFormControl } from '../form/InputFormControl';
-import { PasswordFormControl } from '../form/PasswordFormControl';
+import { InputFormControl } from '../../components/form/InputFormControl';
+import { PasswordFormControl } from '../../components/form/PasswordFormControl';
 
-export const SignUp: React.FC = () => {
+const SignUpForm: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -117,3 +117,5 @@ export const SignUp: React.FC = () => {
     </Flex>
   );
 };
+
+export default SignUpForm;

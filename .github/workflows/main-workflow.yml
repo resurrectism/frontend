@@ -72,31 +72,3 @@ jobs:
         with:
           name: dist
           path: dist
-
-  deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    needs: [install-deps, format-lint, build]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download dist folder
-        uses: actions/download-artifact@v3
-        with:
-          name: dist
-          path: dist/
-
-      - name: Set up S3cmd 
-        uses: s3-actions/s3cmd@v1.1
-        with:
-          provider: linode 
-          region: 'eu-central-1'
-          access_key: ${{ secrets.LINODE_S3_ACCESS_KEY }}
-          secret_key: ${{ secrets.LINODE_S3_SECRET_KEY }}
-
-      - name: Interact with object storage
-        run: |
-          s3cmd sync --no-mime-magic --delete-removed --delete-after --acl-public dist/ s3://resurrectism.denismail.space
-
-      - name: Get info
-        run: s3cmd ws-info s3://resurrectism.denismail.space

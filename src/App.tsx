@@ -1,12 +1,15 @@
-import { Route } from 'wouter';
 import { Flex } from '@chakra-ui/react';
 
-import { Navbar } from './components/navbar/Navbar';
-import HomePage from './pages/home/HomePage';
-import LoginPage from './pages/login/LoginPage';
-import SignUpPage from './pages/signup/SignUpPage';
+import { Navbar } from './components/layout/Navbar';
+import UnauthenticatedContent from './components/layout/UnauthenticatedContent';
+import AuthenticatedContent from './components/layout/AuthenticatedContent';
+import useGlobalRejectionHandler from './hooks/useGlobalRejectionHandler';
+import { useIsAuthenticated } from './hooks/user/useIsAuthenticated';
 
 function App() {
+  const [isAuthenticated] = useIsAuthenticated();
+  useGlobalRejectionHandler();
+
   return (
     <div>
       <Flex
@@ -17,9 +20,11 @@ function App() {
         alignItems="center"
       >
         <Navbar />
-        <Route path="/" component={HomePage} />
-        <Route path="/signup" component={SignUpPage} />
-        <Route path="/login" component={LoginPage} />
+        {isAuthenticated ? (
+          <AuthenticatedContent />
+        ) : (
+          <UnauthenticatedContent />
+        )}
       </Flex>
     </div>
   );

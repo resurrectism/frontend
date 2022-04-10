@@ -12,10 +12,11 @@ import { UserSignUpAttributes } from '../../api/types';
 import { useForm } from 'react-hook-form';
 
 import { Api, UnprocessableEntityError } from '../../api/index';
-import { InputFormControl } from '../form/InputFormControl';
-import { PasswordFormControl } from '../form/PasswordFormControl';
+import { InputFormControl } from '../../components/form/InputFormControl';
+import { PasswordFormControl } from '../../components/form/PasswordFormControl';
+import useToggle from '../../hooks/useToggle';
 
-export const SignUp: React.FC = () => {
+const SignUpForm: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -23,11 +24,11 @@ export const SignUp: React.FC = () => {
   } = useForm<UserSignUpAttributes>();
 
   const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [shouldRenderAlert, setShouldRenderAlert] = useState(false);
+  const [isSuccessful, toggleIsSuccessful] = useToggle();
 
   async function onSubmit(attributes: UserSignUpAttributes) {
     let errors = {};
-    let shouldRenderAlert = false;
+    let isSuccessful = false;
 
     try {
       await Api.usersCreate({
@@ -36,14 +37,14 @@ export const SignUp: React.FC = () => {
           attributes,
         },
       });
-      shouldRenderAlert = true;
+      isSuccessful = true;
     } catch (e) {
       if (e instanceof UnprocessableEntityError) {
         errors = e.errorsMap;
       }
     }
 
-    setShouldRenderAlert(shouldRenderAlert);
+    toggleIsSuccessful(isSuccessful);
     setErrors(errors);
   }
 
@@ -65,7 +66,7 @@ export const SignUp: React.FC = () => {
       p={12}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        {shouldRenderAlert && (
+        {isSuccessful && (
           <Alert status="success" mb={'1em'}>
             <AlertIcon />
             <AlertTitle mr={2}>User Created Successfully!</AlertTitle>
@@ -73,7 +74,7 @@ export const SignUp: React.FC = () => {
               position="absolute"
               right="8px"
               top="8px"
-              onClick={() => setShouldRenderAlert(false)}
+              onClick={() => toggleIsSuccessful(false)}
             />
           </Alert>
         )}
@@ -117,3 +118,5 @@ export const SignUp: React.FC = () => {
     </Flex>
   );
 };
+
+export default SignUpForm;

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Flex,
   Button,
@@ -9,21 +8,26 @@ import {
   AlertDescription,
   Box,
 } from '@chakra-ui/react';
-import { UserLoginAttributes } from '../../api/types';
 import { useForm } from 'react-hook-form';
 
-import { Api, ApiError } from '../../api/index';
-import { InputFormControl } from '../form/InputFormControl';
-import { PasswordFormControl } from '../form/PasswordFormControl';
+import { UserLoginAttributes } from '../../api/types';
+import { Api, UnauthorizedError } from '../../api/index';
+import { InputFormControl } from '../../components/form/InputFormControl';
+import { PasswordFormControl } from '../../components/form/PasswordFormControl';
+import { useUpdateIsAuthenticated } from '../../hooks/user/useIsAuthenticated';
+import useToggle from '../../hooks/useToggle';
+import useRedirect from '../../hooks/useRedirect';
 
-export const Login: React.FC = () => {
+const LoginForm: React.FC = () => {
   const {
     register,
     handleSubmit,
     formState: { isSubmitting },
   } = useForm<UserLoginAttributes>();
 
-  const [shouldRenderAlert, setShouldRenderAlert] = useState(false);
+  const setIsAuthenticated = useUpdateIsAuthenticated();
+  const [hasError, toggleHasError] = useToggle();
+  const redirectTo = useRedirect();
 
   async function onSubmit(attributes: UserLoginAttributes) {
     try {
@@ -33,9 +37,12 @@ export const Login: React.FC = () => {
           attributes,
         },
       });
+      setIsAuthenticated(true);
+      redirectTo('/');
+      toggleHasError(false);
     } catch (e) {
-      if (e instanceof ApiError) {
-        setShouldRenderAlert(true);
+      if (e instanceof UnauthorizedError) {
+        toggleHasError(true);
       } else {
         throw e;
       }
@@ -51,7 +58,7 @@ export const Login: React.FC = () => {
       p={12}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        {shouldRenderAlert && (
+        {hasError && (
           <Alert status="error" mb={'1em'}>
             <AlertIcon />
             <Box flex="1">
@@ -64,7 +71,7 @@ export const Login: React.FC = () => {
               position="absolute"
               right="8px"
               top="8px"
-              onClick={() => setShouldRenderAlert(false)}
+              onClick={() => toggleHasError(false)}
             />
           </Alert>
         )}
@@ -90,3 +97,5 @@ export const Login: React.FC = () => {
     </Flex>
   );
 };
+
+export default LoginForm;

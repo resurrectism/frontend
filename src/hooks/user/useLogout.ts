@@ -1,4 +1,3 @@
-import { RESET } from 'jotai/utils';
 import { useLocation } from 'wouter';
 import { useUpdateIsAuthenticated } from './useIsAuthenticated';
 
@@ -8,6 +7,6 @@ export default function useLogout() {
 
   return () => {
     navigate('/login');
-    setIsAuthenticated(RESET);
+    setIsAuthenticated(false);
   };
 }

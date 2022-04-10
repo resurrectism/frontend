@@ -1,12 +1,12 @@
-import { useLocation } from 'wouter';
+import useRedirect from '../useRedirect';
 import { useUpdateIsAuthenticated } from './useIsAuthenticated';
 
 export default function useLogout() {
   const setIsAuthenticated = useUpdateIsAuthenticated();
-  const [, navigate] = useLocation();
+  const redirectTo = useRedirect();
 
   return () => {
-    navigate('/login');
+    redirectTo('/login');
     setIsAuthenticated(false);
   };
 }

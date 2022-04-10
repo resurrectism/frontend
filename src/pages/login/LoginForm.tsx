@@ -12,11 +12,11 @@ import { useForm } from 'react-hook-form';
 
 import { UserLoginAttributes } from '../../api/types';
 import { Api, UnauthorizedError } from '../../api/index';
-import { useLocation } from 'wouter';
 import { InputFormControl } from '../../components/form/InputFormControl';
 import { PasswordFormControl } from '../../components/form/PasswordFormControl';
 import { useUpdateIsAuthenticated } from '../../hooks/user/useIsAuthenticated';
 import useToggle from '../../hooks/useToggle';
+import useRedirect from '../../hooks/useRedirect';
 
 const LoginForm: React.FC = () => {
   const {
@@ -27,7 +27,7 @@ const LoginForm: React.FC = () => {
 
   const setIsAuthenticated = useUpdateIsAuthenticated();
   const [hasError, toggleHasError] = useToggle();
-  const [, navigate] = useLocation();
+  const redirectTo = useRedirect();
 
   async function onSubmit(attributes: UserLoginAttributes) {
     try {
@@ -38,7 +38,7 @@ const LoginForm: React.FC = () => {
         },
       });
       setIsAuthenticated(true);
-      navigate('/');
+      redirectTo('/');
       toggleHasError(false);
     } catch (e) {
       if (e instanceof UnauthorizedError) {

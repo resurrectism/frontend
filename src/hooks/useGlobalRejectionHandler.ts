@@ -1,22 +1,23 @@
 import { useEffect } from 'react';
 import { UnauthorizedError } from '../api';
-import { useIsAuthenticated } from './user/useIsAuthenticated';
+import useLogout from './user/useLogout';
 
 const UNHANDLED_REJECTION_KEY = 'unhandledrejection';
 
 export default function useGlobalRejectionHandler() {
-  const [isAuthenticated, setIsAuthenticated] = useIsAuthenticated();
+  const logout = useLogout();
 
   useEffect(() => {
     const handleRejection = (event: PromiseRejectionEvent) => {
-      if (event.reason instanceof UnauthorizedError && isAuthenticated) {
-        setIsAuthenticated(false);
+      if (event.reason instanceof UnauthorizedError) {
+        logout();
       }
     };
 
     window.addEventListener(UNHANDLED_REJECTION_KEY, handleRejection);
 
-    return () =>
+    return () => {
       window.removeEventListener(UNHANDLED_REJECTION_KEY, handleRejection);
-  }, [isAuthenticated, setIsAuthenticated]);
+    };
+  }, [logout]);
 }

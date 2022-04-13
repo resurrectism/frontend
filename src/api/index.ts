@@ -51,7 +51,7 @@ export class Api {
   static get host(): string {
     return import.meta.env.PROD
       ? (import.meta.env.VITE_API_URL as string)
-      : 'http://localhost:3000';
+      : 'http://api.resurrectism.test:3000';
   }
 
   static async fetch<Body extends Record<string, unknown>>(
@@ -59,15 +59,15 @@ export class Api {
     method: string,
     data?: Body,
   ) {
-    const options = {
+    const res = await fetch(`${Api.host}${url}`, {
       method,
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/vnd.api+json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(data),
-    };
-    const res = await fetch(`${Api.host}${url}`, options);
+      credentials: 'include',
+    });
 
     let json;
     try {

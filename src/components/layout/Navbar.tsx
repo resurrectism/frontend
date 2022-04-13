@@ -1,8 +1,12 @@
 import { Link } from 'wouter';
 import { Flex, Box, Button } from '@chakra-ui/react';
 
-import { useIsAuthenticated } from '../../hooks/user/useIsAuthenticated';
-import useLogout from '../../hooks/user/useLogout';
+import {
+  useIsAuthenticated,
+  useUpdateIsAuthenticated,
+} from '../../hooks/user/useIsAuthenticated';
+import useRedirect from '../../hooks/useRedirect';
+import { Api } from '../../api';
 
 const NAVBAR_HEIGHT = '3.5rem';
 
@@ -32,7 +36,14 @@ const UnauthenticatedNavbar: React.FC = () => {
 };
 
 const AuthenticatedNavbar: React.FC = () => {
-  const logout = useLogout();
+  const setIsAuthenticated = useUpdateIsAuthenticated();
+  const redirectTo = useRedirect();
+
+  const onLogout = () => {
+    Api.usersLogout();
+    redirectTo('/login');
+    setIsAuthenticated(false);
+  };
 
   return (
     <Flex
@@ -49,7 +60,7 @@ const AuthenticatedNavbar: React.FC = () => {
         </Link>
       </Box>
       <Box>
-        <Button variant="ghost" mr={4} onClick={logout}>
+        <Button variant="ghost" mr={4} onClick={onLogout}>
           Logout
         </Button>
       </Box>

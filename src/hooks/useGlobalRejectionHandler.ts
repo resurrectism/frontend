@@ -1,16 +1,19 @@
 import { useEffect } from 'react';
 import { UnauthorizedError } from '../api';
-import useLogout from './user/useLogout';
+import { useUpdateIsAuthenticated } from './user/useIsAuthenticated';
+import useRedirect from './useRedirect';
 
 const UNHANDLED_REJECTION_KEY = 'unhandledrejection';
 
 export default function useGlobalRejectionHandler() {
-  const logout = useLogout();
+  const setIsAuthenticated = useUpdateIsAuthenticated();
+  const redirectTo = useRedirect();
 
   useEffect(() => {
     const handleRejection = (event: PromiseRejectionEvent) => {
       if (event.reason instanceof UnauthorizedError) {
-        logout();
+        setIsAuthenticated(false);
+        redirectTo('/login');
       }
     };
 
@@ -19,5 +22,5 @@ export default function useGlobalRejectionHandler() {
     return () => {
       window.removeEventListener(UNHANDLED_REJECTION_KEY, handleRejection);
     };
-  }, [logout]);
+  }, [redirectTo, setIsAuthenticated]);
 }

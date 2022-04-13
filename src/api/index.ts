@@ -64,7 +64,6 @@ export class Api {
       mode: 'cors',
       headers: {
         'Content-Type': 'application/vnd.api+json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(data),
       credentials: 'include',

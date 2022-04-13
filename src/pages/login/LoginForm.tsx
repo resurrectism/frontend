@@ -38,8 +38,8 @@ const LoginForm: React.FC = () => {
         },
       });
       setIsAuthenticated(true);
-      redirectTo('/');
       toggleHasError(false);
+      redirectTo('/');
     } catch (e) {
       if (e instanceof UnauthorizedError) {
         toggleHasError(true);

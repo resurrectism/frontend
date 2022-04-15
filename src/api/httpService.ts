@@ -1,4 +1,3 @@
-import fetchWithRefresh from '../utils/fetchWithRefresh';
 import {
   HttpServiceError,
   UnauthorizedError,
@@ -43,7 +42,19 @@ export default class HttpService {
     credentials: 'include',
   });
 
-  private static fetchWithRefresh = fetchWithRefresh(HttpService.refreshToken);
+  private static async fetchWithRefresh(
+    url: RequestInfo,
+    options?: RequestInit,
+  ) {
+    const response = await fetch(url, options);
+
+    if (response.status === 401) {
+      await HttpService.refreshToken();
+      return fetch(url, options);
+    }
+
+    return response;
+  }
 
   private static async fetch<Body extends Record<string, unknown>>(
     url: string,

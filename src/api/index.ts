@@ -4,20 +4,42 @@ import {
   UnprocessableEntityError,
 } from './errors';
 import { UserLogin, UserSignUp } from './types';
+import fetchWithRefresh from '../utils/fetchWithRefresh';
 
 export class Api {
-  static get host(): string {
+  // Users API
+  static usersLogin = async (body: UserLogin) => Api.post('/users/login', body);
+
+  static usersCreate = async (body: UserSignUp) => Api.post('/users', body);
+
+  static usersLogout = async () => Api.post('/users/logout', {});
+
+  // Profile API
+  static profile = async () => Api.get('/profile');
+
+  // Private
+  private static get host(): string {
     return import.meta.env.PROD
       ? (import.meta.env.VITE_API_URL as string)
       : 'http://api.resurrectism.test:3000';
   }
 
-  static async fetch<Body extends Record<string, unknown>>(
+  private static commonOptions: RequestInit = Object.freeze({
+    method: 'GET',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/vnd.api+json',
+    },
+    credentials: 'include',
+  });
+  private static fetchWithRefresh = fetchWithRefresh(Api.refreshToken);
+
+  private static async fetch<Body extends Record<string, unknown>>(
     url: string,
     method: string,
     data?: Body,
   ) {
-    const res = await fetch(`${Api.host}${url}`, {
+    const res = await Api.fetchWithRefresh(`${Api.host}${url}`, {
       method,
       mode: 'cors',
       headers: {
@@ -46,32 +68,32 @@ export class Api {
     return json;
   }
 
-  static get = async (url: string) => Api.fetch(url, 'GET');
+  private static async get(url: string) {
+    return Api.fetch(url, 'GET');
+  }
 
-  static post = async <Body extends Record<string, unknown>>(
+  private static async post<Body extends Record<string, unknown>>(
     url: string,
     data: Body,
-  ) => Api.fetch(url, 'POST', data);
+  ) {
+    return Api.fetch(url, 'POST', data);
+  }
 
-  static put = async <Body extends Record<string, unknown>>(
+  private static async put<Body extends Record<string, unknown>>(
     url: string,
     data: Body,
-  ) => Api.fetch(url, 'PUT', data);
+  ) {
+    return Api.fetch(url, 'PUT', data);
+  }
 
-  static delete = async (url: string) => Api.fetch(url, 'DELETE');
+  private static async delete(url: string) {
+    return Api.fetch(url, 'DELETE');
+  }
 
-  // Users API
-  static usersLogin = async (body: UserLogin) => Api.post('/users/login', body);
-
-  static usersCreate = async (body: UserSignUp) => Api.post('/users', body);
-
-  static usersLogout = async () => Api.post('/users/logout', {});
-
-  static usersRefreshToken = async () => {
-    const body = { refreshToken: localStorage.getItem('refreshToken') };
-    return Api.post('/users/refresh_token', body);
-  };
-
-  // Profile API
-  static profile = async () => Api.get('/profile');
+  private static refreshToken() {
+    return fetch(`${Api.host}/users/refresh_token`, {
+      ...Api.commonOptions,
+      method: 'POST',
+    });
+  }
 }

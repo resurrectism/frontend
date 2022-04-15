@@ -1,15 +1,15 @@
+export class HttpServiceError extends Error {
+  constructor(public json: Record<string, unknown>, public status: number) {
+    super('HTTP error with status ' + status);
+  }
+}
+
 type ModelValidationError = {
   source: {
     pointer: string;
   };
   detail: string;
 };
-
-export class ApiError extends Error {
-  constructor(public json: Record<string, unknown>, public status: number) {
-    super('Api error with status ' + status);
-  }
-}
 
 export class UnprocessableEntityError extends Error {
   public errorsMap: Record<string, string[]>;

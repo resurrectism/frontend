@@ -11,10 +11,11 @@ import {
 import { UserSignUpAttributes } from '../../api/types';
 import { useForm } from 'react-hook-form';
 
-import { Api, UnprocessableEntityError } from '../../api/index';
+import { Api } from '../../api/index';
 import { InputFormControl } from '../../components/form/InputFormControl';
 import { PasswordFormControl } from '../../components/form/PasswordFormControl';
 import useToggle from '../../hooks/useToggle';
+import { UnprocessableEntityError } from '../../api/errors';
 
 const SignUpForm: React.FC = () => {
   const {

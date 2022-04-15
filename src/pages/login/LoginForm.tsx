@@ -11,12 +11,13 @@ import {
 import { useForm } from 'react-hook-form';
 
 import { UserLoginAttributes } from '../../api/types';
-import { Api, UnauthorizedError } from '../../api/index';
+import { Api } from '../../api/index';
 import { InputFormControl } from '../../components/form/InputFormControl';
 import { PasswordFormControl } from '../../components/form/PasswordFormControl';
 import { useUpdateIsAuthenticated } from '../../hooks/user/useIsAuthenticated';
 import useToggle from '../../hooks/useToggle';
 import useRedirect from '../../hooks/useRedirect';
+import { UnauthorizedError } from '../../api/errors';
 
 const LoginForm: React.FC = () => {
   const {

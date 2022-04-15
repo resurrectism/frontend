@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { UnauthorizedError } from '../api';
+import { UnauthorizedError } from '../api/errors';
 import { useUpdateIsAuthenticated } from './user/useIsAuthenticated';
 import useRedirect from './useRedirect';
 

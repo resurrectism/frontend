@@ -28,11 +28,6 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Prettier
-        uses: EPMatt/reviewdog-action-prettier@v1
-        with:
-          level: warning
-
       - name: eslint
         uses: reviewdog/action-eslint@v1
         with:

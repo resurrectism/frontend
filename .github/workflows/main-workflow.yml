@@ -43,11 +43,16 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-modules-
 
-      - name: Run prettier format check
-        run: yarn format:check
+      - name: Prettier
+        uses: EPMatt/reviewdog-action-prettier@v1
+        with:
+          level: warning
 
-      - name: Run eslint check
-        run: yarn lint:check
+      - name: eslint
+        uses: reviewdog/action-eslint@v1
+
+      - name: tsc
+        uses: EPMatt/reviewdog-action-tsc@v1
 
   build:
     needs: install-deps

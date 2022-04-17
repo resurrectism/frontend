@@ -1,0 +1,42 @@
+name: Reviewdog
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  format-lint-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js 16.13.0
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.13.0
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-modules-
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Prettier
+        uses: EPMatt/reviewdog-action-prettier@v1
+        with:
+          level: warning
+
+      - name: eslint
+        uses: reviewdog/action-eslint@v1
+        with:
+          reporter: github-pr-check
+
+      - name: tsc
+        uses: EPMatt/reviewdog-action-tsc@v1

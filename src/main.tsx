@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 
 const customTheme = extendTheme(
-  withDefaultColorScheme({ colorScheme: 'teal' }),
+  withDefaultColorScheme({ colorScheme: 'purple' }),
 );
 
 ReactDOM.render(

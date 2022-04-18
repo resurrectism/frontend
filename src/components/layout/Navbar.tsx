@@ -7,6 +7,7 @@ import {
 } from '../../hooks/user/useIsAuthenticated';
 import useRedirect from '../../hooks/useRedirect';
 import { Api } from '../../api';
+import ThemeToggle from '../ThemeToggle';
 
 const NAVBAR_HEIGHT = '3.5rem';
 
@@ -19,6 +20,7 @@ const UnauthenticatedNavbar: React.FC = () => {
       justifyContent="flex-end"
     >
       <Box>
+        <ThemeToggle />
         <Link href="/signup">
           <Button variant="ghost" mr={4}>
             Sign Up
@@ -60,6 +62,7 @@ const AuthenticatedNavbar: React.FC = () => {
         </Link>
       </Box>
       <Box>
+        <ThemeToggle />
         <Button variant="ghost" mr={4} onClick={onLogout}>
           Logout
         </Button>

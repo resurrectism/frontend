@@ -1,5 +1,19 @@
 # Resurrectism Frontend
 
+## Cloud Infrastructure
+
+Our api service is hosted on [render](https://render.com/) which is a PaaS (Platform-as-a-Service) Cloud Provider. The diagram below shows the interaction between the different components of our application
+
+![Cloud Infrastructure](./cloud_Infrastructure.png)
+
+## Continious Integration / Continious Deployment
+
+Our `main` branch is protected and new commits can only be added via pull request. Pull requests need to be approved and must pass all of the CI (Github Actions) checks which include proper formatting, absence of linting errors and security vulnerabilities and of course passing tests.
+
+Each new commit to main triggers a new deploy on [render](https://render.com/). The diagram below shows the different steps of our CI/CD pipeline
+
+![CI CD](./Frontend_CI_CD.png)
+
 Live version running on https://resurrectism.space
 
 ## Local Development
@@ -70,9 +84,3 @@ Fix (if possible) linting errors with:
 ```sh
 yarn lint
 ```
-
-## Deployment
-
-Our `main` branch is protected and new commits can only be added via pull request. Pull requests need to be approved and must pass all of the CI checks which include proper formatting, absence of linting errors and successful build.
-
-The frontend client is automatically deployed on every new commit to `main` by [render](https://render.com/)

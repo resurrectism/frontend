@@ -14,3 +14,9 @@ export type UserSignUpAttributes = {
   password_confirmation: string;
 };
 export type UserSignUp = Resource<UserSignUpAttributes, 'user'>;
+
+export type ProfileAttributes = {
+  email: string;
+};
+
+export type Profile = Resource<ProfileAttributes, 'profile'>;

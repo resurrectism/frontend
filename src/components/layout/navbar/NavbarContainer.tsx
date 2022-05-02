@@ -1,4 +1,5 @@
-import { Flex, FlexProps, theme, useColorModeValue } from '@chakra-ui/react';
+import { Flex, FlexProps, useColorModeValue } from '@chakra-ui/react';
+import { theme } from '../../../styles/theme';
 
 const NAVBAR_HEIGHT = '3.5rem';
 

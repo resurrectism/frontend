@@ -1,4 +1,6 @@
-import { Flex } from '@chakra-ui/react';
+import { AbsoluteCenter, Flex, Spinner } from '@chakra-ui/react';
+import { Provider } from 'jotai';
+import { Suspense } from 'react';
 
 import { Navbar } from './components/layout/Navbar';
 import UnauthenticatedContent from './components/layout/UnauthenticatedContent';
@@ -11,7 +13,7 @@ function App() {
   useGlobalRejectionHandler();
 
   return (
-    <div>
+    <Provider>
       <Flex
         w="100vw"
         h="100vh"
@@ -20,13 +22,21 @@ function App() {
         alignItems="center"
       >
         <Navbar />
-        {isAuthenticated ? (
-          <AuthenticatedContent />
-        ) : (
-          <UnauthenticatedContent />
-        )}
+        <Suspense
+          fallback={
+            <AbsoluteCenter>
+              <Spinner />
+            </AbsoluteCenter>
+          }
+        >
+          {isAuthenticated ? (
+            <AuthenticatedContent />
+          ) : (
+            <UnauthenticatedContent />
+          )}
+        </Suspense>
       </Flex>
-    </div>
+    </Provider>
   );
 }
 

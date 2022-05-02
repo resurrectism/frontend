@@ -2,7 +2,7 @@ import { AbsoluteCenter, Flex, Spinner } from '@chakra-ui/react';
 import { Provider } from 'jotai';
 import { Suspense } from 'react';
 
-import { Navbar } from './components/layout/Navbar';
+import { Navbar } from './components/layout/navbar/Navbar';
 import UnauthenticatedContent from './components/layout/UnauthenticatedContent';
 import AuthenticatedContent from './components/layout/AuthenticatedContent';
 import useGlobalRejectionHandler from './hooks/useGlobalRejectionHandler';

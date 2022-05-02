@@ -8,6 +8,7 @@ import {
   ThemeComponentProps,
   withDefaultColorScheme,
 } from '@chakra-ui/react';
+import { Provider } from 'jotai';
 
 const customTheme = extendTheme(
   {
@@ -27,7 +28,9 @@ const customTheme = extendTheme(
 ReactDOM.render(
   <React.StrictMode>
     <ChakraProvider theme={customTheme}>
-      <App />
+      <Provider>
+        <App />
+      </Provider>
     </ChakraProvider>
   </React.StrictMode>,
   document.getElementById('root'),

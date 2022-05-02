@@ -1,5 +1,4 @@
 import { AbsoluteCenter, Flex, Spinner } from '@chakra-ui/react';
-import { Provider } from 'jotai';
 import { Suspense } from 'react';
 
 import { Navbar } from './components/layout/navbar/Navbar';
@@ -13,30 +12,36 @@ function App() {
   useGlobalRejectionHandler();
 
   return (
-    <Provider>
-      <Flex
-        w="100vw"
-        h="100vh"
-        direction="column"
-        justifyContent="flex-start"
-        alignItems="center"
+    <Flex
+      w="100vw"
+      h="100vh"
+      direction="column"
+      justifyContent="flex-start"
+      alignItems="stretch"
+    >
+      <Navbar />
+      <Suspense
+        fallback={
+          <AbsoluteCenter>
+            <Spinner />
+          </AbsoluteCenter>
+        }
       >
-        <Navbar />
-        <Suspense
-          fallback={
-            <AbsoluteCenter>
-              <Spinner />
-            </AbsoluteCenter>
-          }
+        <Flex
+          direction="column"
+          justifyContent="flex-start"
+          alignItems="center"
+          width="100%"
+          p={10}
         >
           {isAuthenticated ? (
             <AuthenticatedContent />
           ) : (
             <UnauthenticatedContent />
           )}
-        </Suspense>
-      </Flex>
-    </Provider>
+        </Flex>
+      </Suspense>
+    </Flex>
   );
 }
 

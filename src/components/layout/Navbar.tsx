@@ -1,5 +1,14 @@
 import { Link } from 'wouter';
-import { Flex, Box, Button } from '@chakra-ui/react';
+import {
+  Flex,
+  Box,
+  Button,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Avatar,
+} from '@chakra-ui/react';
 
 import {
   useIsAuthenticated,
@@ -8,6 +17,9 @@ import {
 import useRedirect from '../../hooks/useRedirect';
 import { Api } from '../../api';
 import ThemeToggle from '../ThemeToggle';
+import { ChevronDownIcon } from '@chakra-ui/icons';
+import ProfileAvatar from '../ProfileAvatar';
+import { Suspense } from 'react';
 
 const NAVBAR_HEIGHT = '3.5rem';
 
@@ -18,6 +30,7 @@ const UnauthenticatedNavbar: React.FC = () => {
       h={NAVBAR_HEIGHT}
       alignItems="center"
       justifyContent="flex-end"
+      px={4}
     >
       <Box>
         <ThemeToggle />
@@ -53,20 +66,35 @@ const AuthenticatedNavbar: React.FC = () => {
       h={NAVBAR_HEIGHT}
       alignItems="center"
       justifyContent="space-between"
+      px={4}
     >
       <Box>
         <Link href="/">
-          <Button variant="ghost" mr={4}>
-            Home
-          </Button>
+          <Button variant="ghost">Home</Button>
         </Link>
       </Box>
-      <Box>
-        <ThemeToggle />
-        <Button variant="ghost" mr={4} onClick={onLogout}>
-          Logout
-        </Button>
-      </Box>
+      <Flex>
+        <Box mr={2}>
+          <ThemeToggle />
+        </Box>
+        <Menu>
+          <MenuButton
+            as={Button}
+            variant="link"
+            rightIcon={<ChevronDownIcon />}
+          >
+            <Suspense fallback={<Avatar size="sm" />}>
+              <ProfileAvatar />
+            </Suspense>
+          </MenuButton>
+          <MenuList>
+            <Link href="/profile">
+              <MenuItem>Profile</MenuItem>
+            </Link>
+            <MenuItem onClick={onLogout}>Logout</MenuItem>
+          </MenuList>
+        </Menu>
+      </Flex>
     </Flex>
   );
 };

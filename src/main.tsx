@@ -2,20 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import {
-  ChakraProvider,
-  extendTheme,
-  withDefaultColorScheme,
-} from '@chakra-ui/react';
-
-const customTheme = extendTheme(
-  withDefaultColorScheme({ colorScheme: 'purple' }),
-);
+import { ChakraProvider } from '@chakra-ui/react';
+import { Provider } from 'jotai';
+import { theme } from './styles/theme';
 
 ReactDOM.render(
   <React.StrictMode>
-    <ChakraProvider theme={customTheme}>
-      <App />
+    <ChakraProvider theme={theme}>
+      <Provider>
+        <App />
+      </Provider>
     </ChakraProvider>
   </React.StrictMode>,
   document.getElementById('root'),

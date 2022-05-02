@@ -88,3 +88,13 @@ Fix (if possible) linting errors with:
 ```sh
 yarn lint
 ```
+
+### Testing
+
+We use [vitest](https://vitest.dev/) for testing which integrates nicely with vite and needs very minimal configuration compared to jest.
+
+To run the test suite:
+
+```sh
+yarn test
+```

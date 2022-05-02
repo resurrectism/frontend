@@ -4,13 +4,13 @@ import {
   Box,
   Button,
   Flex,
-  Link,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
 } from '@chakra-ui/react';
 import { Suspense } from 'react';
+import { Link } from 'wouter';
 import { Api } from '../../../api';
 import { useUpdateIsAuthenticated } from '../../../hooks/user/useIsAuthenticated';
 import useRedirect from '../../../hooks/useRedirect';

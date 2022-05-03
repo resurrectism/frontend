@@ -12,11 +12,11 @@ const failurePromiseWithData = (): Promise<{ data: string }> =>
   });
 
 describe('data', () => {
-  test('returns the "data" attribute on success', () => {
-    expect(data(successPromiseWithData())).resolves.toBe('Hello World');
+  test('returns the "data" attribute on success', async () => {
+    await expect(data(successPromiseWithData())).resolves.toBe('Hello World');
   });
 
-  test('throws on Promise failure', () => {
-    expect(() => data(failurePromiseWithData())).rejects.toThrow();
+  test('throws on Promise failure', async () => {
+    await expect(() => data(failurePromiseWithData())).rejects.toThrow();
   });
 });
